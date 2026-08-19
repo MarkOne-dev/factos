@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Comprobante de Pago Electrónico</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+        .container {
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .header {
+            width: 100%;
+            margin-bottom: 30px;
+            display: table;
+        }
+        .header-logo-section {
+            display: table-cell;
+            width: 60%;
+            vertical-align: top;
+        }
+        .header-ruc-box {
+            display: table-cell;
+            width: 40%;
+            border: 2px solid #002e5b;
+            text-align: center;
+            padding: 15px;
+            vertical-align: middle;
+            background-color: #f7f9fc;
+        }
+        .header-ruc-box h2 {
+            margin: 0 0 10px 0;
+            color: #002e5b;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+        .header-ruc-box h3 {
+            margin: 0;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .header-ruc-box p {
+            margin: 10px 0 0 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+        }
+        .company-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #002e5b;
+            margin: 0 0 5px 0;
+        }
+        .company-details {
+            font-size: 10px;
+            color: #666666;
+            margin: 0;
+        }
+        .info-table {
+            width: 100%;
+            margin-bottom: 25px;
+            border-collapse: collapse;
+        }
+        .info-table td {
+            padding: 4px 0;
+            vertical-align: top;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555555;
+            width: 18%;
+        }
+        .info-value {
+            color: #333333;
+            width: 32%;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .items-table th {
+            background-color: #002e5b;
+            color: #ffffff;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px 10px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        .items-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .totals-section {
+            width: 100%;
+            display: table;
+            margin-bottom: 30px;
+        }
+        .totals-qr {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+        }
+        .totals-values {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+        }
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .totals-table td {
+            padding: 5px 10px;
+        }
+        .totals-label {
+            font-weight: bold;
+            color: #555555;
+            width: 60%;
+        }
+        .totals-amount {
+            font-weight: bold;
+            color: #333333;
+            width: 40%;
+        }
+        .totals-table tr.grand-total td {
+            border-top: 2px solid #002e5b;
+            background-color: #f7f9fc;
+            padding: 8px 10px;
+        }
+        .totals-table tr.grand-total .totals-label {
+            color: #002e5b;
+            font-size: 12px;
+        }
+        .totals-table tr.grand-total .totals-amount {
+            color: #002e5b;
+            font-size: 12px;
+        }
+        .qr-code {
+            width: 130px;
+            height: 130px;
+        }
+        .legal-footer {
+            border-top: 1px solid #cccccc;
+            padding-top: 15px;
+            font-size: 9px;
+            color: #888888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="header-logo-section">
+            <div class="company-name">EMISOR DE PRUEBA S.A.C.</div>
+            <div class="company-details">
+                Dirección del Emisor Principal Nro. 123<br/>
+                Lima - Lima - Lima<br/>
+                Teléfono: (01) 456-7890 | Email: contacto@emisor.com
+            </div>
+        </div>
+        <div class="header-ruc-box">
+            <h2>R.U.C. <span th:text="${cpe.getIssuerRuc().value()}">20123456789</span></h2>
+            <h3 th:text="${isInvoice ? 'FACTURA ELECTRÓNICA' : 'BOLETA DE VENTA ELECTRÓNICA'}">FACTURA ELECTRÓNICA</h3>
+            <p th:text="${cpe.getSeries() + '-' + cpe.getCorrelative()}">F001-00000001</p>
+        </div>
+    </div>
+
+    <table class="info-table">
+        <tr>
+            <td class="info-label">Fecha Emisión:</td>
+            <td class="info-value" th:text="${cpe.getIssueDate()}">2026-08-19</td>
+            <td class="info-label" th:text="${isInvoice ? 'Adquiriente (RUC):' : 'Cliente (Doc):'}">Adquiriente (RUC):</td>
+            <td class="info-value" th:text="${cpe.getAcquirerDocument()}">20987654321</td>
+        </tr>
+        <tr>
+            <td class="info-label">Moneda:</td>
+            <td class="info-value" th:text="${totals.totalAmount().currency()}">PEN</td>
+            <td class="info-label" th:text="${isInvoice ? 'Razón Social:' : 'Nombres/Apellidos:'}">Razón Social:</td>
+            <td class="info-value" th:text="${cpe.getAcquirerName()}">CLIENTE DE PRUEBA S.A.</td>
+        </tr>
+    </table>
+
+    <table class="items-table">
+        <thead>
+        <tr>
+            <th style="width: 10%;">Código</th>
+            <th style="width: 50%;">Descripción</th>
+            <th style="width: 10%;" class="text-right">Cantidad</th>
+            <th style="width: 15%;" class="text-right">Val. Unitario</th>
+            <th style="width: 15%;" class="text-right">Importe</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${items}">
+            <td th:text="${item.getCode()}">P001</td>
+            <td th:text="${item.getDescription()}">Producto de Prueba Nro 1</td>
+            <td class="text-right" th:text="${#numbers.formatDecimal(item.getQuantity(), 1, 2)}">1.00</td>
+            <td class="text-right" th:text="${item.getUnitValue().amount()}">100.00</td>
+            <td class="text-right" th:text="${item.getTotal().amount()}">118.00</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="totals-section">
+        <div class="totals-qr">
+            <img class="qr-code" th:src="${qrCodeBase64}" alt="Código QR SUNAT"/>
+        </div>
+        <div class="totals-values">
+            <table class="totals-table">
+                <tr>
+                    <td class="totals-label">Op. Gravadas:</td>
+                    <td class="totals-amount text-right" th:text="${totals.totalTaxable().currency() + ' ' + totals.totalTaxable().amount()}">PEN 100.00</td>
+                </tr>
+                <tr th:if="${!totals.totalExonerated().isZero()}">
+                    <td class="totals-label">Op. Exoneradas:</td>
+                    <td class="totals-amount text-right" th:text="${totals.totalExonerated().currency() + ' ' + totals.totalExonerated().amount()}">PEN 0.00</td>
+                </tr>
+                <tr th:if="${!totals.totalInactive().isZero()}">
+                    <td class="totals-label">Op. Inafectas:</td>
+                    <td class="totals-amount text-right" th:text="${totals.totalInactive().currency() + ' ' + totals.totalInactive().amount()}">PEN 0.00</td>
+                </tr>
+                <tr>
+                    <td class="totals-label">I.G.V. (18%):</td>
+                    <td class="totals-amount text-right" th:text="${totals.totalIgv().currency() + ' ' + totals.totalIgv().amount()}">PEN 18.00</td>
+                </tr>
+                <tr th:if="${!totals.totalFree().isZero()}">
+                    <td class="totals-label">Op. Gratuitas:</td>
+                    <td class="totals-amount text-right" th:text="${totals.totalFree().currency() + ' ' + totals.totalFree().amount()}">PEN 0.00</td>
+                </tr>
+                <tr class="grand-total">
+                    <td class="totals-label">Importe Total:</td>
+                    <td class="totals-amount text-right" th:text="${totals.totalAmount().currency() + ' ' + totals.totalAmount().amount()}">PEN 118.00</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="legal-footer">
+        Representación impresa de la Factura Electrónica.<br/>
+        Autorizado mediante Resolución de SUNAT.<br/>
+        Consulte la validez de este documento en el portal web de la SUNAT.
+    </div>
+</div>
+</body>
+</html>
