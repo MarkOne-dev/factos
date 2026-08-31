@@ -17,6 +17,7 @@ public record CpeResource(
         BigDecimal totalIgv,
         BigDecimal totalAmount,
         String currency,
+        String pdfUrl,
         List<ItemResource> items
 ) {
 }
