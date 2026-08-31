@@ -1,12 +1,16 @@
-package pe.factos.issuer.domain.model;
+package pe.factos.issuer.domain.model.aggregates;
 
+import pe.factos.issuer.domain.model.valueobjects.AuthorizedSeries;
+import pe.factos.issuer.domain.model.valueobjects.DigitalCertificate;
+import pe.factos.issuer.domain.model.valueobjects.Ruc;
 import pe.factos.shared.domain.BusinessException;
+import pe.factos.shared.domain.model.aggregates.AbstractDomainAggregateRoot;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Issuer {
+public class Issuer extends AbstractDomainAggregateRoot<Issuer> {
     private final Ruc ruc;
     private String corporateName;
     private String address;
@@ -27,6 +31,10 @@ public class Issuer {
         this.ubigeo = ubigeo;
         this.certificate = certificate;
         this.authorizedSeries = new ArrayList<>();
+    }
+
+    public Issuer(Ruc ruc, String corporateName, String address, String ubigeo) {
+        this(ruc, corporateName, address, ubigeo, null);
     }
 
     public Ruc getRuc() {

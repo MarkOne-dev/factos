@@ -1,6 +1,6 @@
 package pe.factos.billing.domain.model;
 
-import pe.factos.issuer.domain.model.Ruc;
+import pe.factos.issuer.domain.model.valueobjects.Ruc;
 import pe.factos.shared.domain.BusinessException;
 
 import java.time.LocalDate;

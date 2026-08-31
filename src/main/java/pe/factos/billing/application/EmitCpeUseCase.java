@@ -11,9 +11,9 @@ import pe.factos.billing.domain.port.*;
 import pe.factos.billing.domain.service.IgvCalculator;
 import pe.factos.catalog.domain.CpeType;
 import pe.factos.catalog.domain.IgvAffectationType;
-import pe.factos.issuer.domain.model.Issuer;
-import pe.factos.issuer.domain.model.Ruc;
-import pe.factos.issuer.domain.port.IssuerRepository;
+import pe.factos.issuer.domain.model.aggregates.Issuer;
+import pe.factos.issuer.domain.model.valueobjects.Ruc;
+import pe.factos.issuer.domain.repositories.IssuerRepository;
 import pe.factos.shared.domain.BusinessException;
 import pe.factos.shared.domain.DomainEventPublisher;
 

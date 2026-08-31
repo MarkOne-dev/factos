@@ -1,4 +1,4 @@
-package pe.factos.issuer.domain.model;
+package pe.factos.issuer.domain.model.valueobjects;
 
 import pe.factos.shared.domain.BusinessException;
 

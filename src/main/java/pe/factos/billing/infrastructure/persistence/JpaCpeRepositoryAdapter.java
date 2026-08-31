@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pe.factos.billing.domain.model.*;
 import pe.factos.billing.domain.port.CpeRepository;
 import pe.factos.catalog.domain.IgvAffectationType;
-import pe.factos.issuer.domain.model.Ruc;
+import pe.factos.issuer.domain.model.valueobjects.Ruc;
 
 import java.util.List;
 import java.util.Optional;

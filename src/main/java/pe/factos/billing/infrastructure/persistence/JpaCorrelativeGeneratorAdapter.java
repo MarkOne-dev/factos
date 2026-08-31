@@ -3,7 +3,7 @@ package pe.factos.billing.infrastructure.persistence;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pe.factos.billing.domain.port.CorrelativeGenerator;
-import pe.factos.issuer.domain.model.Ruc;
+import pe.factos.issuer.domain.model.valueobjects.Ruc;
 
 import java.util.Optional;
 
