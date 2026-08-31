@@ -19,6 +19,8 @@ public final class CpeResourceFromAggregateAssembler {
                 ))
                 .toList();
 
+        String pdfUrl = "/api/v1/rendering/pdf/" + aggregate.getSeries() + "/" + aggregate.getCorrelative();
+
         return new CpeResource(
                 aggregate.getSeries(),
                 aggregate.getCorrelative(),
@@ -32,6 +34,7 @@ public final class CpeResourceFromAggregateAssembler {
                 aggregate.getTotals().totalIgv().amount(),
                 aggregate.getTotals().totalAmount().amount(),
                 aggregate.getTotals().totalAmount().currency(),
+                pdfUrl,
                 itemResources
         );
     }
