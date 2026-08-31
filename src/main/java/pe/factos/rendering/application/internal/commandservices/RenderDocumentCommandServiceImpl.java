@@ -17,7 +17,7 @@ public class RenderDocumentCommandServiceImpl implements RenderDocumentCommandSe
     private final DocumentRenderer documentRenderer;
     private final ObjectStoragePort objectStoragePort;
 
-    @Value("${application.storage.s3.bucket-name:factos-pdf-storage}")
+    @Value("${application.storage.s3.bucket-name:factos-bucket}")
     private String bucketName;
 
     public RenderDocumentCommandServiceImpl(

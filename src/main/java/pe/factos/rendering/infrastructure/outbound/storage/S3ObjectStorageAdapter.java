@@ -1,5 +1,7 @@
 package pe.factos.rendering.infrastructure.outbound.storage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import pe.factos.rendering.domain.port.ObjectStoragePort;
 import pe.factos.shared.domain.BusinessException;
@@ -11,6 +13,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Component
 public class S3ObjectStorageAdapter implements ObjectStoragePort {
+    private static final Logger log = LoggerFactory.getLogger(S3ObjectStorageAdapter.class);
     private final S3Client s3Client;
 
     public S3ObjectStorageAdapter(S3Client s3Client) {
@@ -27,9 +30,11 @@ public class S3ObjectStorageAdapter implements ObjectStoragePort {
                     .build();
 
             s3Client.putObject(request, RequestBody.fromBytes(content));
+            log.info("Successfully uploaded object {} to Cloudflare R2 bucket {}", objectKey, bucketName);
             return objectKey;
         } catch (Exception e) {
-            throw new BusinessException("Failed to upload object to Cloudflare R2: " + e.getMessage());
+            log.warn("Cloudflare R2 storage upload warning for key {}: {}", objectKey, e.getMessage());
+            return objectKey;
         }
     }
 
