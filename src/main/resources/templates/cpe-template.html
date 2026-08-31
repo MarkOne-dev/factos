@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Comprobante Electrónico</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 20px; color: #333; }
+        .header { text-align: center; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-bottom: 20px; }
+        .company-name { font-size: 20px; font-weight: bold; color: #0056b3; }
+        .doc-title { font-size: 18px; font-weight: bold; margin-top: 5px; }
+        .details-table, .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .items-table th { background-color: #f2f2f2; }
+        .totals-section { text-align: right; margin-top: 10px; }
+        .qr-code { text-align: center; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name" th:text="${cpe.issuerRuc.value()}">RUC EMISOR</div>
+        <div class="doc-title" th:text="${isInvoice ? 'FACTURA ELECTRÓNICA' : 'BOLETA DE VENTA ELECTRÓNICA'}">COMPROBANTE</div>
+        <div th:text="${cpe.series + '-' + cpe.correlative}">F001-00000001</div>
+    </div>
+
+    <table class="details-table">
+        <tr>
+            <td><strong>Fecha de Emisión:</strong> <span th:text="${cpe.issueDate}">2026-08-31</span></td>
+            <td><strong>Cliente:</strong> <span th:text="${cpe.acquirerName}">CLIENTE</span></td>
+        </tr>
+        <tr>
+            <td><strong>Doc. Adquiriente:</strong> <span th:text="${cpe.acquirerDocument}">12345678</span></td>
+            <td><strong>Estado:</strong> <span th:text="${cpe.status}">EMITTED</span></td>
+        </tr>
+    </table>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>P. Unitario</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.code}">PROD01</td>
+                <td th:text="${item.description}">Producto Ejemplo</td>
+                <td th:text="${item.quantity}">1</td>
+                <td th:text="${item.unitPrice.amount()}">100.00</td>
+                <td th:text="${item.total.amount()}">100.00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="totals-section">
+        <p><strong>Op. Gravada:</strong> S/ <span th:text="${totals.totalTaxable().amount()}">0.00</span></p>
+        <p><strong>IGV (18%):</strong> S/ <span th:text="${totals.totalIgv().amount()}">0.00</span></p>
+        <p><strong>Total Importe:</strong> S/ <span th:text="${totals.totalAmount().amount()}">0.00</span></p>
+    </div>
+
+    <div class="qr-code">
+        <img th:src="${qrCodeBase64}" width="150" height="150" alt="Código QR SUNAT"/>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package pe.factos.rendering.infrastructure.pdf;
+package pe.factos.rendering.infrastructure.outbound.pdf;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -13,22 +13,19 @@ import pe.factos.rendering.domain.port.DocumentRenderer;
 import pe.factos.shared.domain.BusinessException;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Base64;
 
 @Component
-public class ThymeleafDocumentRenderer implements DocumentRenderer {
-
+public class ThymeleafDocumentRendererAdapter implements DocumentRenderer {
     private final TemplateEngine templateEngine;
 
-    public ThymeleafDocumentRenderer(TemplateEngine templateEngine) {
+    public ThymeleafDocumentRendererAdapter(TemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
     }
 
     @Override
     public byte[] renderPdf(Cpe cpe) {
         try {
-            // Build official SUNAT QR metadata content string
             String docType = cpe.getCpeType() != null ? cpe.getCpeType() : "01";
             String acquirerDocType = cpe.getAcquirerDocument() != null && cpe.getAcquirerDocument().length() == 8 ? "1" : "6";
             String acquirerDocNum = cpe.getAcquirerDocument() != null ? cpe.getAcquirerDocument() : "";
@@ -43,14 +40,12 @@ public class ThymeleafDocumentRenderer implements DocumentRenderer {
                     cpe.getIssueDate().toString(),
                     acquirerDocType,
                     acquirerDocNum,
-                    "MOCK_SIGNATURE_VALUE_BASE64_ABC123"
+                    "MOCK_SIGNATURE_VALUE_BASE64"
             );
 
-            // Generate QR code png image bytes
             byte[] qrImageBytes = generateQr(qrContent, 200, 200);
             String qrBase64 = Base64.getEncoder().encodeToString(qrImageBytes);
 
-            // Populate Thymeleaf Context
             Context context = new Context();
             context.setVariable("cpe", cpe);
             context.setVariable("totals", cpe.getTotals());
@@ -58,10 +53,8 @@ public class ThymeleafDocumentRenderer implements DocumentRenderer {
             context.setVariable("isInvoice", "01".equals(docType));
             context.setVariable("qrCodeBase64", "data:image/png;base64," + qrBase64);
 
-            // Process HTML template
             String htmlContent = templateEngine.process("cpe-template", context);
 
-            // Convert HTML to PDF using Flying Saucer OpenPDF
             try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                 PdfRendererBuilder builder = new PdfRendererBuilder();
                 builder.useFastMode();
