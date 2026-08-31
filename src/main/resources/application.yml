@@ -19,6 +19,15 @@ spring:
     baseline-on-migrate: true
     locations: classpath:db/migration
 
+application:
+  storage:
+    s3:
+      endpoint: ${CLOUDFLARE_R2_ENDPOINT:https://8d009c5a27b703c2906fd1b00b96908c.r2.cloudflarestorage.com}
+      access-key: ${CLOUDFLARE_R2_ACCESS_KEY:f84173333e47e104c44c7b0881e1cbc5}
+      secret-key: ${CLOUDFLARE_R2_SECRET_KEY:3ca7f93131e22ccfb157b65af299a16b8f169e93a86e70b02e9d2db3229709d6}
+      bucket-name: ${CLOUDFLARE_R2_BUCKET_NAME:factos-pdf-storage}
+      region: ${CLOUDFLARE_R2_REGION:auto}
+
 server:
   port: ${PORT:8080}
 
