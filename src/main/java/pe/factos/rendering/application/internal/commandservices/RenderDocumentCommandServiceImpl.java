@@ -38,8 +38,19 @@ public class RenderDocumentCommandServiceImpl implements RenderDocumentCommandSe
             return Result.failure(ApplicationError.notFound("cpe", command.series() + "-" + command.correlative()));
         }
 
+        String objectKey = "facturas/" + command.series() + "-" + command.correlative() + ".pdf";
+
+        // Try downloading existing PDF from Cloudflare R2 bucket first
         try {
-            String objectKey = "facturas/" + command.series() + "-" + command.correlative() + ".pdf";
+            byte[] cachedBytes = objectStoragePort.downloadFile(bucketName, objectKey);
+            if (cachedBytes != null && cachedBytes.length > 0) {
+                return Result.success(cachedBytes);
+            }
+        } catch (Exception ignored) {
+            // If not found in Cloudflare R2, fallback to render and upload
+        }
+
+        try {
             byte[] pdfBytes = documentRenderer.renderPdf(cpeOpt.get());
 
             // Persist generated PDF to Cloudflare R2 Object Storage
