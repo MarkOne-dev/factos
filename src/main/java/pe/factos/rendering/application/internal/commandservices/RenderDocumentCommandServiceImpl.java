@@ -1,11 +1,13 @@
 package pe.factos.rendering.application.internal.commandservices;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pe.factos.billing.application.internal.queryservices.CpeQueryService;
 import pe.factos.billing.domain.model.queries.GetCpeBySeriesAndCorrelativeQuery;
 import pe.factos.rendering.domain.model.commands.GenerateQrCommand;
 import pe.factos.rendering.domain.model.commands.RenderPdfCommand;
 import pe.factos.rendering.domain.port.DocumentRenderer;
+import pe.factos.rendering.domain.port.ObjectStoragePort;
 import pe.factos.shared.application.result.ApplicationError;
 import pe.factos.shared.application.result.Result;
 
@@ -13,10 +15,19 @@ import pe.factos.shared.application.result.Result;
 public class RenderDocumentCommandServiceImpl implements RenderDocumentCommandService {
     private final CpeQueryService cpeQueryService;
     private final DocumentRenderer documentRenderer;
+    private final ObjectStoragePort objectStoragePort;
 
-    public RenderDocumentCommandServiceImpl(CpeQueryService cpeQueryService, DocumentRenderer documentRenderer) {
+    @Value("${application.storage.s3.bucket-name:factos-bucket}")
+    private String bucketName;
+
+    public RenderDocumentCommandServiceImpl(
+            CpeQueryService cpeQueryService,
+            DocumentRenderer documentRenderer,
+            ObjectStoragePort objectStoragePort
+    ) {
         this.cpeQueryService = cpeQueryService;
         this.documentRenderer = documentRenderer;
+        this.objectStoragePort = objectStoragePort;
     }
 
     @Override
@@ -28,10 +39,15 @@ public class RenderDocumentCommandServiceImpl implements RenderDocumentCommandSe
         }
 
         try {
+            String objectKey = "facturas/" + command.series() + "-" + command.correlative() + ".pdf";
             byte[] pdfBytes = documentRenderer.renderPdf(cpeOpt.get());
+
+            // Persist generated PDF to Cloudflare R2 Object Storage
+            objectStoragePort.uploadFile(bucketName, objectKey, pdfBytes, "application/pdf");
+
             return Result.success(pdfBytes);
         } catch (Exception e) {
-            return Result.failure(ApplicationError.unexpected("rendering", "Failed to render PDF: " + e.getMessage()));
+            return Result.failure(ApplicationError.unexpected("rendering", "Failed to render and store PDF: " + e.getMessage()));
         }
     }
 

@@ -1,0 +1,1 @@
+{"code":"UNEXPECTED_ERROR","message":"Unexpected error in global-exception-handler","details":"No converter for [class pe.factos.shared.interfaces.rest.resources.ErrorResource] with preset Content-Type 'null'"}
