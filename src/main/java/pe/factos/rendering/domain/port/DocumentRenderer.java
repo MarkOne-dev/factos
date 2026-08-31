@@ -1,6 +1,6 @@
 package pe.factos.rendering.domain.port;
 
-import pe.factos.billing.domain.model.Cpe;
+import pe.factos.billing.domain.model.aggregates.Cpe;
 
 public interface DocumentRenderer {
     byte[] renderPdf(Cpe cpe);

@@ -8,7 +8,7 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import pe.factos.billing.domain.model.Cpe;
+import pe.factos.billing.domain.model.aggregates.Cpe;
 import pe.factos.rendering.domain.port.DocumentRenderer;
 import pe.factos.shared.domain.BusinessException;
 
@@ -29,7 +29,7 @@ public class ThymeleafDocumentRenderer implements DocumentRenderer {
     public byte[] renderPdf(Cpe cpe) {
         try {
             // Build official SUNAT QR metadata content string
-            String docType = cpe instanceof pe.factos.billing.domain.model.Invoice ? "01" : "03";
+            String docType = cpe.getCpeType() != null ? cpe.getCpeType() : "01";
             String acquirerDocType = cpe.getAcquirerDocument() != null && cpe.getAcquirerDocument().length() == 8 ? "1" : "6";
             String acquirerDocNum = cpe.getAcquirerDocument() != null ? cpe.getAcquirerDocument() : "";
 
@@ -55,7 +55,7 @@ public class ThymeleafDocumentRenderer implements DocumentRenderer {
             context.setVariable("cpe", cpe);
             context.setVariable("totals", cpe.getTotals());
             context.setVariable("items", cpe.getItems());
-            context.setVariable("isInvoice", cpe instanceof pe.factos.billing.domain.model.Invoice);
+            context.setVariable("isInvoice", "01".equals(docType));
             context.setVariable("qrCodeBase64", "data:image/png;base64," + qrBase64);
 
             // Process HTML template
