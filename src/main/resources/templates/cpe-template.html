@@ -2,66 +2,424 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Comprobante Electrónico</title>
+    <title>Comprobante de Pago Electrónico</title>
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 20px; color: #333; }
-        .header { text-align: center; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-bottom: 20px; }
-        .company-name { font-size: 20px; font-weight: bold; color: #0056b3; }
-        .doc-title { font-size: 18px; font-weight: bold; margin-top: 5px; }
-        .details-table, .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .items-table th { background-color: #f2f2f2; }
-        .totals-section { text-align: right; margin-top: 10px; }
-        .qr-code { text-align: center; margin-top: 20px; }
+        @page {
+            size: A4;
+            margin-top: 12mm;
+            margin-left: 12mm;
+            margin-right: 12mm;
+            margin-bottom: 36mm; /* Margen reservado al fondo para el pie de página fijo */
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 10.5px;
+            color: #334155;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Contenedor Principal */
+        .page-container {
+            width: 100%;
+        }
+
+        /* Tabla de Cabecera (Emisor vs RUC Box) */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .issuer-col {
+            width: 60%;
+            vertical-align: top;
+            padding-right: 15px;
+        }
+
+        .brand-badge {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: bold;
+            color: #0EA5E9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .issuer-name {
+            font-size: 17px;
+            font-weight: 800;
+            color: #0F172A;
+            margin: 0 0 6px 0;
+            text-transform: uppercase;
+        }
+
+        .issuer-info {
+            font-size: 10px;
+            color: #64748B;
+            line-height: 1.5;
+        }
+
+        .ruc-box-col {
+            width: 40%;
+            vertical-align: top;
+        }
+
+        .ruc-box {
+            border: 2px solid #0F172A;
+            border-radius: 6px;
+            text-align: center;
+            background-color: #FFFFFF;
+            overflow: hidden;
+        }
+
+        .ruc-box-header {
+            background-color: #0F172A;
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 6px 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .ruc-box-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #0EA5E9;
+            padding: 8px 4px;
+            text-transform: uppercase;
+        }
+
+        .ruc-box-number {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0F172A;
+            padding: 0 4px 8px 4px;
+        }
+
+        /* Tarjeta de Datos del Adquiriente / Cliente */
+        .client-card {
+            width: 100%;
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid #0EA5E9;
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin-bottom: 15px;
+        }
+
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .client-table td {
+            padding: 3px 0;
+            vertical-align: top;
+            font-size: 10.5px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #475569;
+            width: 130px;
+        }
+
+        .value {
+            color: #0F172A;
+        }
+
+        .badge-status {
+            display: inline-block;
+            background-color: #DCFCE7;
+            color: #166534;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Tabla de Ítems / Productos */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+
+        .items-table th {
+            background-color: #1E293B;
+            color: #FFFFFF;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 8px 10px;
+            text-align: left;
+            letter-spacing: 0.5px;
+        }
+
+        .items-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 10px;
+            color: #334155;
+        }
+
+        .items-table tbody tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-mono { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+
+        /* Sección de Totales (Alineada a la Derecha) */
+        .totals-section-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .totals-space-col {
+            width: 55%;
+        }
+
+        .totals-data-col {
+            width: 45%;
+            vertical-align: top;
+        }
+
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .totals-table td {
+            padding: 4px 8px;
+            font-size: 10px;
+        }
+
+        .totals-label {
+            text-align: right;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .totals-value {
+            text-align: right;
+            color: #0F172A;
+            font-weight: bold;
+        }
+
+        .total-card {
+            background-color: #0F172A;
+            color: #FFFFFF;
+            border-radius: 4px;
+            margin-top: 6px;
+            padding: 4px 0;
+        }
+
+        .total-card td {
+            color: #FFFFFF;
+            font-size: 11px;
+        }
+
+        .total-card .totals-value {
+            color: #38BDF8;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        /* PIE DE PÁGINA FIJO AL FONDO DE LA HOJA (Fixed Bottom Page Footer) */
+        .page-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30mm;
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 4px;
+            padding: 8px 10px;
+        }
+
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .footer-qr-td {
+            width: 95px;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .footer-qr-img {
+            border: 1px solid #CBD5E1;
+            padding: 3px;
+            background-color: #FFFFFF;
+            border-radius: 4px;
+        }
+
+        .footer-text-td {
+            vertical-align: middle;
+            padding-left: 10px;
+        }
+
+        .footer-legal-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #0F172A;
+            margin-bottom: 3px;
+        }
+
+        .footer-legal-desc {
+            font-size: 9px;
+            color: #64748B;
+            line-height: 1.4;
+        }
+
+        .footer-hash-box {
+            font-size: 8.5px;
+            color: #94A3B8;
+            font-family: 'Courier New', Courier, monospace;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="company-name" th:text="${cpe.issuerRuc.value()}">RUC EMISOR</div>
-        <div class="doc-title" th:text="${isInvoice ? 'FACTURA ELECTRÓNICA' : 'BOLETA DE VENTA ELECTRÓNICA'}">COMPROBANTE</div>
-        <div th:text="${cpe.series + '-' + cpe.correlative}">F001-00000001</div>
-    </div>
-
-    <table class="details-table">
-        <tr>
-            <td><strong>Fecha de Emisión:</strong> <span th:text="${cpe.issueDate}">2026-08-31</span></td>
-            <td><strong>Cliente:</strong> <span th:text="${cpe.acquirerName}">CLIENTE</span></td>
-        </tr>
-        <tr>
-            <td><strong>Doc. Adquiriente:</strong> <span th:text="${cpe.acquirerDocument}">12345678</span></td>
-            <td><strong>Estado:</strong> <span th:text="${cpe.status}">EMITTED</span></td>
-        </tr>
-    </table>
-
-    <table class="items-table">
-        <thead>
+    
+    <!-- PIE DE PÁGINA FIJO AL FONDO DE LA HOJA -->
+    <div class="page-footer">
+        <table class="footer-table">
             <tr>
-                <th>Código</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>P. Unitario</th>
-                <th>Total</th>
+                <td class="footer-qr-td">
+                    <img class="footer-qr-img" th:src="${qrCodeBase64}" width="85" height="85" alt="Código QR SUNAT"/>
+                </td>
+                <td class="footer-text-td">
+                    <div class="footer-legal-title">Representación Impresa del Comprobante de Pago Electrónico</div>
+                    <div class="footer-legal-desc">
+                        Este documento ha sido emitido electrónicamente de acuerdo a la normativa vigente de la SUNAT.<br/>
+                        Consulte la validez y autenticidad de este comprobante ingresando a nuestro portal web o escaneando el código QR adjunto.
+                    </div>
+                    <div class="footer-hash-box">
+                        Resumen Digital / Firma: MOCK_SIGNATURE_VALUE_BASE64_FACTOS_CLOUD
+                    </div>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <tr th:each="item : ${items}">
-                <td th:text="${item.code}">PROD01</td>
-                <td th:text="${item.description}">Producto Ejemplo</td>
-                <td th:text="${item.quantity}">1</td>
-                <td th:text="${item.unitPrice.amount()}">100.00</td>
-                <td th:text="${item.total.amount()}">100.00</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="totals-section">
-        <p><strong>Op. Gravada:</strong> S/ <span th:text="${totals.totalTaxable().amount()}">0.00</span></p>
-        <p><strong>IGV (18%):</strong> S/ <span th:text="${totals.totalIgv().amount()}">0.00</span></p>
-        <p><strong>Total Importe:</strong> S/ <span th:text="${totals.totalAmount().amount()}">0.00</span></p>
+        </table>
     </div>
 
-    <div class="qr-code">
-        <img th:src="${qrCodeBase64}" width="150" height="150" alt="Código QR SUNAT"/>
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="page-container">
+        
+        <!-- Cabecera Emisor vs Box RUC -->
+        <table class="header-table">
+            <tr>
+                <td class="issuer-col">
+                    <div class="brand-badge">Facturación Electrónica Cloud</div>
+                    <div class="issuer-name">FACTOS TECH S.A.C.</div>
+                    <div class="issuer-info">
+                        <strong>RUC:</strong> <span th:text="${cpe.issuerRuc.value()}">20123456789</span><br/>
+                        <strong>Dirección Fiscal:</strong> Av. Javier Prado Este 456, San Isidro, Lima<br/>
+                        <strong>Teléfono:</strong> (01) 500-8000 | <strong>Email:</strong> contacto@factos.pe
+                    </div>
+                </td>
+                <td class="ruc-box-col">
+                    <div class="ruc-box">
+                        <div class="ruc-box-header">
+                            R.U.C. N° <span th:text="${cpe.issuerRuc.value()}">20123456789</span>
+                        </div>
+                        <div class="ruc-box-title" th:text="${isInvoice ? 'FACTURA ELECTRÓNICA' : 'BOLETA DE VENTA ELECTRÓNICA'}">
+                            FACTURA ELECTRÓNICA
+                        </div>
+                        <div class="ruc-box-number" th:text="${cpe.series + ' - ' + cpe.correlative}">
+                            F001 - 00000001
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Datos del Cliente / Adquiriente -->
+        <div class="client-card">
+            <table class="client-table">
+                <tr>
+                    <td class="label">Señor(es):</td>
+                    <td class="value" th:text="${cpe.acquirerName}">CLIENTE EJEMPLO S.A.C.</td>
+                    <td class="label">Fecha de Emisión:</td>
+                    <td class="value" th:text="${cpe.issueDate}">2026-08-31</td>
+                </tr>
+                <tr>
+                    <td class="label">Doc. Identidad:</td>
+                    <td class="value" th:text="${cpe.acquirerDocument}">20111222333</td>
+                    <td class="label">Moneda:</td>
+                    <td class="value" th:text="${totals.totalAmount().currency()}">PEN</td>
+                </tr>
+                <tr>
+                    <td class="label">Tipo Operación:</td>
+                    <td class="value">Venta Interna (0101)</td>
+                    <td class="label">Estado SUNAT:</td>
+                    <td class="value">
+                        <span class="badge-status" th:text="${cpe.status}">EMITIDO</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Tabla de Ítems / Detalle -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 12%;">Código</th>
+                    <th style="width: 48%;">Descripción / Producto</th>
+                    <th style="width: 10%; text-align: center;">Cant.</th>
+                    <th style="width: 15%; text-align: right;">P. Unitario</th>
+                    <th style="width: 15%; text-align: right;">Importe</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${items}">
+                    <td class="font-mono" th:text="${item.code}">PROD-001</td>
+                    <td th:text="${item.description}">Servicio de Desarrollo de Software</td>
+                    <td class="text-center" th:text="${item.quantity}">1</td>
+                    <td class="text-right" th:text="${item.unitPrice.amount()}">100.00</td>
+                    <td class="text-right font-mono" th:text="${item.total.amount()}">100.00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Sección de Totales (Alineada a la Derecha) -->
+        <table class="totals-section-table">
+            <tr>
+                <td class="totals-space-col"></td>
+                <td class="totals-data-col">
+                    <table class="totals-table">
+                        <tr>
+                            <td class="totals-label">Op. Gravada:</td>
+                            <td class="totals-value">S/ <span th:text="${totals.totalTaxable().amount()}">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td class="totals-label">IGV (18%):</td>
+                            <td class="totals-value">S/ <span th:text="${totals.totalIgv().amount()}">0.00</span></td>
+                        </tr>
+                    </table>
+                    
+                    <div class="total-card">
+                        <table class="totals-table">
+                            <tr>
+                                <td class="totals-label" style="color: #FFFFFF; font-size: 11px;">TOTAL IMPORTE:</td>
+                                <td class="totals-value">S/ <span th:text="${totals.totalAmount().amount()}">0.00</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
     </div>
 </body>
 </html>
