@@ -11,7 +11,7 @@
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 11px;
+            font-size: 10.5px;
             color: #334155;
             line-height: 1.4;
             margin: 0;
@@ -47,7 +47,7 @@
         }
 
         .issuer-name {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 800;
             color: #0F172A;
             margin: 0 0 6px 0;
@@ -144,7 +144,7 @@
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .items-table th {
@@ -173,35 +173,18 @@
         .text-right { text-align: right; }
         .font-mono { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
 
-        /* Sección Inferior (QR + Totales) */
-        .footer-table {
+        /* Sección de Totales (Alineada a la Derecha) */
+        .totals-section-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-bottom: 25px;
         }
 
-        .qr-col {
+        .totals-space-col {
             width: 55%;
-            vertical-align: top;
-            padding-right: 15px;
         }
 
-        .qr-container {
-            display: inline-block;
-            border: 1px solid #E2E8F0;
-            padding: 6px;
-            border-radius: 4px;
-            background-color: #FFFFFF;
-        }
-
-        .legal-notice {
-            font-size: 9px;
-            color: #64748B;
-            margin-top: 8px;
-            line-height: 1.4;
-        }
-
-        .totals-col {
+        .totals-data-col {
             width: 45%;
             vertical-align: top;
         }
@@ -231,22 +214,73 @@
         .total-card {
             background-color: #0F172A;
             color: #FFFFFF;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 8px 10px;
             border-radius: 4px;
             margin-top: 6px;
+            padding: 4px 0;
         }
 
         .total-card td {
             color: #FFFFFF;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .total-card .totals-value {
             color: #38BDF8;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
+        }
+
+        /* Footer Inferior Orgánico (QR y Leyenda al Pie de Página) */
+        .footer-card {
+            width: 100%;
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .footer-qr-td {
+            width: 105px;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .footer-qr-img {
+            border: 1px solid #CBD5E1;
+            padding: 4px;
+            background-color: #FFFFFF;
+            border-radius: 4px;
+        }
+
+        .footer-text-td {
+            vertical-align: middle;
+            padding-left: 12px;
+        }
+
+        .footer-legal-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #0F172A;
+            margin-bottom: 3px;
+        }
+
+        .footer-legal-desc {
+            font-size: 9px;
+            color: #64748B;
+            line-height: 1.4;
+        }
+
+        .footer-hash-box {
+            font-size: 8.5px;
+            color: #94A3B8;
+            font-family: 'Courier New', Courier, monospace;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -329,19 +363,11 @@
             </tbody>
         </table>
 
-        <!-- Sección Inferior: QR + Totales -->
-        <table class="footer-table">
+        <!-- Sección de Totales (Alineada a la Derecha) -->
+        <table class="totals-section-table">
             <tr>
-                <td class="qr-col">
-                    <div class="qr-container">
-                        <img th:src="${qrCodeBase64}" width="125" height="125" alt="Código QR SUNAT"/>
-                    </div>
-                    <div class="legal-notice">
-                        Representación impresa del Comprobante de Pago Electrónico generado desde <strong>Factos API Cloud</strong>.<br/>
-                        Consulte la validez de este documento ingresando a nuestro portal o con su código QR.
-                    </div>
-                </td>
-                <td class="totals-col">
+                <td class="totals-space-col"></td>
+                <td class="totals-data-col">
                     <table class="totals-table">
                         <tr>
                             <td class="totals-label">Op. Gravada:</td>
@@ -356,7 +382,7 @@
                     <div class="total-card">
                         <table class="totals-table">
                             <tr>
-                                <td class="totals-label" style="color: #FFFFFF; font-size: 12px;">TOTAL IMPORTE:</td>
+                                <td class="totals-label" style="color: #FFFFFF; font-size: 11px;">TOTAL IMPORTE:</td>
                                 <td class="totals-value">S/ <span th:text="${totals.totalAmount().amount()}">0.00</span></td>
                             </tr>
                         </table>
@@ -364,6 +390,27 @@
                 </td>
             </tr>
         </table>
+
+        <!-- Pie de Página Orgánico: Código QR y Leyenda SUNAT al Pie -->
+        <div class="footer-card">
+            <table class="footer-table">
+                <tr>
+                    <td class="footer-qr-td">
+                        <img class="footer-qr-img" th:src="${qrCodeBase64}" width="95" height="95" alt="Código QR SUNAT"/>
+                    </td>
+                    <td class="footer-text-td">
+                        <div class="footer-legal-title">Representación Impresa del Comprobante de Pago Electrónico</div>
+                        <div class="footer-legal-desc">
+                            Este documento ha sido emitido electrónicamente de acuerdo a la normativa vigente de la SUNAT.<br/>
+                            Consulte la validez y autenticidad de este comprobante ingresando a nuestro portal web o escaneando el código QR adjunto.
+                        </div>
+                        <div class="footer-hash-box">
+                            Resumen Digital / Firma: MOCK_SIGNATURE_VALUE_BASE64_FACTOS_CLOUD
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
     </div>
 </body>
