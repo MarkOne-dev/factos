@@ -6,7 +6,10 @@
     <style>
         @page {
             size: A4;
-            margin: 12mm 12mm 12mm 12mm;
+            margin-top: 12mm;
+            margin-left: 12mm;
+            margin-right: 12mm;
+            margin-bottom: 36mm; /* Margen reservado al fondo para el pie de página fijo */
         }
 
         body {
@@ -177,7 +180,7 @@
         .totals-section-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .totals-space-col {
@@ -221,7 +224,7 @@
 
         .total-card td {
             color: #FFFFFF;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .total-card .totals-value {
@@ -230,14 +233,17 @@
             font-weight: 800;
         }
 
-        /* Footer Inferior Orgánico (QR y Leyenda al Pie de Página) */
-        .footer-card {
-            width: 100%;
+        /* PIE DE PÁGINA FIJO AL FONDO DE LA HOJA (Fixed Bottom Page Footer) */
+        .page-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30mm;
             background-color: #F8FAFC;
             border: 1px solid #E2E8F0;
             border-radius: 4px;
-            padding: 10px;
-            margin-top: 20px;
+            padding: 8px 10px;
         }
 
         .footer-table {
@@ -246,21 +252,21 @@
         }
 
         .footer-qr-td {
-            width: 105px;
+            width: 95px;
             vertical-align: middle;
             text-align: center;
         }
 
         .footer-qr-img {
             border: 1px solid #CBD5E1;
-            padding: 4px;
+            padding: 3px;
             background-color: #FFFFFF;
             border-radius: 4px;
         }
 
         .footer-text-td {
             vertical-align: middle;
-            padding-left: 12px;
+            padding-left: 10px;
         }
 
         .footer-legal-title {
@@ -285,6 +291,29 @@
     </style>
 </head>
 <body>
+    
+    <!-- PIE DE PÁGINA FIJO AL FONDO DE LA HOJA -->
+    <div class="page-footer">
+        <table class="footer-table">
+            <tr>
+                <td class="footer-qr-td">
+                    <img class="footer-qr-img" th:src="${qrCodeBase64}" width="85" height="85" alt="Código QR SUNAT"/>
+                </td>
+                <td class="footer-text-td">
+                    <div class="footer-legal-title">Representación Impresa del Comprobante de Pago Electrónico</div>
+                    <div class="footer-legal-desc">
+                        Este documento ha sido emitido electrónicamente de acuerdo a la normativa vigente de la SUNAT.<br/>
+                        Consulte la validez y autenticidad de este comprobante ingresando a nuestro portal web o escaneando el código QR adjunto.
+                    </div>
+                    <div class="footer-hash-box">
+                        Resumen Digital / Firma: MOCK_SIGNATURE_VALUE_BASE64_FACTOS_CLOUD
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
     <div class="page-container">
         
         <!-- Cabecera Emisor vs Box RUC -->
@@ -390,27 +419,6 @@
                 </td>
             </tr>
         </table>
-
-        <!-- Pie de Página Orgánico: Código QR y Leyenda SUNAT al Pie -->
-        <div class="footer-card">
-            <table class="footer-table">
-                <tr>
-                    <td class="footer-qr-td">
-                        <img class="footer-qr-img" th:src="${qrCodeBase64}" width="95" height="95" alt="Código QR SUNAT"/>
-                    </td>
-                    <td class="footer-text-td">
-                        <div class="footer-legal-title">Representación Impresa del Comprobante de Pago Electrónico</div>
-                        <div class="footer-legal-desc">
-                            Este documento ha sido emitido electrónicamente de acuerdo a la normativa vigente de la SUNAT.<br/>
-                            Consulte la validez y autenticidad de este comprobante ingresando a nuestro portal web o escaneando el código QR adjunto.
-                        </div>
-                        <div class="footer-hash-box">
-                            Resumen Digital / Firma: MOCK_SIGNATURE_VALUE_BASE64_FACTOS_CLOUD
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
 
     </div>
 </body>
