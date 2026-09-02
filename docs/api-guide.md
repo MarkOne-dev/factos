@@ -109,7 +109,7 @@ Consulta los elementos codificados de los catálogos SUNAT (ej. `CAT-01` Tipos d
 ### Paso 4: Emitir una Factura Electrónica (`cpeType: "01"`)
 Emite una nueva Factura Electrónica. El servicio autocalcula la base imponible, IGV (18%), importe total y almacena automáticamente el PDF impreso en el bucket de **Cloudflare R2**.
 
-* **Endpoint:** `POST /api/v1/comprobantes`
+* **Endpoint:** `POST /api/v1/documents` *(Nota: `/api/v1/comprobantes` también se mantiene soportado por compatibilidad)*
 * **Headers:** `X-API-KEY: aa1e22c0ea1b41adbd1ce571542213bb`
 
 #### Ejemplo de Entrada (Request Body):
@@ -168,7 +168,7 @@ Emite una nueva Factura Electrónica. El servicio autocalcula la base imponible,
 ### Paso 5: Emitir una Boleta de Venta Electrónica (`cpeType: "03"`)
 Emite una Boleta de Venta Electrónica dirigida a personas naturales o clientes finales (usando DNI de 8 dígitos o RUC). El PDF impreso generado contendrá automáticamente el encabezado **BOLETA DE VENTA ELECTRÓNICA**.
 
-* **Endpoint:** `POST /api/v1/comprobantes`
+* **Endpoint:** `POST /api/v1/documents`
 * **Headers:** `X-API-KEY: aa1e22c0ea1b41adbd1ce571542213bb`
 
 #### Ejemplo de Entrada (Request Body):
@@ -227,7 +227,7 @@ Emite una Boleta de Venta Electrónica dirigida a personas naturales o clientes 
 ### Paso 6: Consultar un Comprobante por Serie y Correlativo
 Obtén los datos de cualquier comprobante (Factura o Boleta) emitido anteriormente.
 
-* **Endpoint:** `GET /api/v1/comprobantes/B001/00000001`
+* **Endpoint:** `GET /api/v1/documents/B001/00000001`
 * **Headers:** `X-API-KEY: aa1e22c0ea1b41adbd1ce571542213bb`
 
 ---
