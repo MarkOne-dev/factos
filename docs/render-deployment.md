@@ -66,3 +66,10 @@ En la sección **Environment Variables** en Render, agrega las siguientes claves
 ## 🔄 Despliegues Automáticos (CI/CD)
 
 Cada vez que realices un `git push` a la rama `main` en GitHub, Render detectará los cambios, compilará la nueva imagen Docker y desplegará la versión actualizada automáticamente **sin tiempo de caída (Zero-Downtime Deployment)**.
+
+---
+
+## 📖 5. Guía Completa de Uso de la API REST
+
+Una vez desplegado en Render, consulta la guía de integración completa en [`docs/api-guide.md`](api-guide.md) para realizar la generación de API Keys, registro de emisor, emisión de comprobantes y descarga de PDFs.
+
