@@ -1,5 +1,8 @@
 package pe.factos.billing.application.internal.queryservices;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.factos.billing.domain.model.aggregates.Cpe;
@@ -27,7 +30,8 @@ public class CpeQueryServiceImpl implements CpeQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Cpe> handle(GetCpesByIssuerRucQuery query) {
-        return cpeRepository.findAllByIssuerRuc(new Ruc(query.issuerRuc()));
+    public Page<Cpe> handle(GetCpesByIssuerRucQuery query) {
+        Pageable pageable = query.pageable() != null ? query.pageable() : PageRequest.of(0, 20);
+        return cpeRepository.findAllByIssuerRuc(new Ruc(query.issuerRuc()), pageable);
     }
 }
