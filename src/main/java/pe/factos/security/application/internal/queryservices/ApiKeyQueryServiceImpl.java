@@ -6,6 +6,8 @@ import pe.factos.security.domain.model.aggregates.ApiKey;
 import pe.factos.security.domain.model.queries.GetApiKeyByKeyQuery;
 import pe.factos.security.domain.repositories.ApiKeyRepository;
 
+import pe.factos.security.infrastructure.security.ApiKeyHashUtils;
+
 import java.util.Optional;
 
 @Service
@@ -19,6 +21,7 @@ public class ApiKeyQueryServiceImpl implements ApiKeyQueryService {
     @Override
     @Transactional(readOnly = true)
     public Optional<ApiKey> handle(GetApiKeyByKeyQuery query) {
-        return apiKeyRepository.findByKeyValue(query.keyValue());
+        String hashedKey = ApiKeyHashUtils.hashApiKey(query.keyValue());
+        return apiKeyRepository.findByKeyValue(hashedKey);
     }
 }
