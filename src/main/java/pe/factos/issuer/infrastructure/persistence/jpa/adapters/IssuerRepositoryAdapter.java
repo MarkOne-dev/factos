@@ -33,7 +33,7 @@ public class IssuerRepositoryAdapter implements IssuerRepository {
     @Override
     public Optional<Issuer> findByRuc(Ruc ruc) {
         return repository.findByRuc(ruc.value())
-                .map(IssuerJpaEntity::toDomain);
+                .map(entity -> entity.toDomain());
     }
 
     @Override

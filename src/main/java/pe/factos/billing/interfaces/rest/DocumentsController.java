@@ -19,8 +19,6 @@ import pe.factos.billing.interfaces.rest.transform.CpeResourceFromAggregateAssem
 import pe.factos.billing.interfaces.rest.transform.EmitCpeCommandFromResourceAssembler;
 import pe.factos.shared.interfaces.rest.transform.ResponseEntityAssembler;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(value = {"/api/v1/documents", "/api/v1/comprobantes"}, produces = "application/json")
 @Tag(name = "Electronic Documents", description = "Endpoints for emitting and querying Electronic Invoices (Facturas) and Sales Receipts (Boletas)")

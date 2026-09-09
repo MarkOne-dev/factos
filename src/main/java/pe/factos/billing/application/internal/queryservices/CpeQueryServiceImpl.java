@@ -11,7 +11,6 @@ import pe.factos.billing.domain.model.queries.GetCpesByIssuerRucQuery;
 import pe.factos.billing.domain.repositories.CpeRepository;
 import pe.factos.issuer.domain.model.valueobjects.Ruc;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service

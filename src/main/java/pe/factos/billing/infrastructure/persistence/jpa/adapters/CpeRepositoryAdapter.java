@@ -34,20 +34,20 @@ public class CpeRepositoryAdapter implements CpeRepository {
     @Override
     public Optional<Cpe> findBySeriesAndCorrelative(String series, String correlative) {
         return repository.findBySeriesAndCorrelative(series, correlative)
-                .map(CpeJpaEntity::toDomain);
+                .map(entity -> entity.toDomain());
     }
 
     @Override
     public List<Cpe> findAllByIssuerRuc(Ruc issuerRuc) {
         return repository.findAllByIssuerRuc(issuerRuc.value()).stream()
-                .map(CpeJpaEntity::toDomain)
+                .map(entity -> entity.toDomain())
                 .toList();
     }
 
     @Override
     public Page<Cpe> findAllByIssuerRuc(Ruc issuerRuc, Pageable pageable) {
         return repository.findAllByIssuerRuc(issuerRuc.value(), pageable)
-                .map(CpeJpaEntity::toDomain);
+                .map(entity -> entity.toDomain());
     }
 
     @Override

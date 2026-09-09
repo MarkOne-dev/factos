@@ -57,7 +57,6 @@ public class ThymeleafDocumentRendererAdapter implements DocumentRenderer {
 
             try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                 PdfRendererBuilder builder = new PdfRendererBuilder();
-                builder.useFastMode();
                 builder.withHtmlContent(htmlContent, "/");
                 builder.toStream(os);
                 builder.run();
