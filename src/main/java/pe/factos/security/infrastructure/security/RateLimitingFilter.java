@@ -40,7 +40,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             return;
         }
 
-        String clientIp = request.getRemoteAddr();
+        String clientIp = extractClientIp(request);
         Bucket bucket = buckets.computeIfAbsent(clientIp, k -> createNewBucket());
 
         if (bucket.tryConsume(1)) {
@@ -50,5 +50,17 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.getWriter().write("{\"code\":\"TOO_MANY_REQUESTS\",\"message\":\"API Rate limit exceeded. Maximum 100 requests per minute.\"}");
         }
+    }
+
+    private String extractClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isBlank() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isBlank() && !"unknown".equalsIgnoreCase(xRealIp)) {
+            return xRealIp.trim();
+        }
+        return request.getRemoteAddr();
     }
 }
