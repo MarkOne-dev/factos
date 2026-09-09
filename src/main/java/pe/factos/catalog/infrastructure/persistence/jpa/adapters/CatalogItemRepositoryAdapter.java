@@ -26,13 +26,13 @@ public class CatalogItemRepositoryAdapter implements CatalogItemRepository {
     @Override
     public Optional<CatalogItem> findByCatalogCodeAndItemCode(String catalogCode, String itemCode) {
         return repository.findByCatalogCodeAndItemCode(catalogCode, itemCode)
-                .map(CatalogItemJpaEntity::toDomain);
+                .map(entity -> entity.toDomain());
     }
 
     @Override
     public List<CatalogItem> findAllByCatalogCode(String catalogCode) {
         return repository.findAllByCatalogCode(catalogCode).stream()
-                .map(CatalogItemJpaEntity::toDomain)
+                .map(entity -> entity.toDomain())
                 .toList();
     }
 }

@@ -30,7 +30,7 @@ public class ApiKeyRepositoryAdapter implements ApiKeyRepository {
     @Override
     public Optional<ApiKey> findByKeyValue(String keyValue) {
         return repository.findByKeyValue(keyValue)
-                .map(ApiKeyJpaEntity::toDomain);
+                .map(entity -> entity.toDomain());
     }
 
     @Override
