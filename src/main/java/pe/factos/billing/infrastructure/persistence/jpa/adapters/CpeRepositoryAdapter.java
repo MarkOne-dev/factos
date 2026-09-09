@@ -1,5 +1,7 @@
 package pe.factos.billing.infrastructure.persistence.jpa.adapters;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import pe.factos.billing.domain.model.aggregates.Cpe;
 import pe.factos.billing.domain.repositories.CpeRepository;
@@ -40,6 +42,12 @@ public class CpeRepositoryAdapter implements CpeRepository {
         return repository.findAllByIssuerRuc(issuerRuc.value()).stream()
                 .map(CpeJpaEntity::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<Cpe> findAllByIssuerRuc(Ruc issuerRuc, Pageable pageable) {
+        return repository.findAllByIssuerRuc(issuerRuc.value(), pageable)
+                .map(CpeJpaEntity::toDomain);
     }
 
     @Override

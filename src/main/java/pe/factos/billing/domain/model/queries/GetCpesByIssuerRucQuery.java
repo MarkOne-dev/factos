@@ -1,4 +1,9 @@
 package pe.factos.billing.domain.model.queries;
 
-public record GetCpesByIssuerRucQuery(String issuerRuc) {
+import org.springframework.data.domain.Pageable;
+
+public record GetCpesByIssuerRucQuery(String issuerRuc, Pageable pageable) {
+    public GetCpesByIssuerRucQuery(String issuerRuc) {
+        this(issuerRuc, null);
+    }
 }

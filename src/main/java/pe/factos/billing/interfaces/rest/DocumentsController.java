@@ -3,6 +3,9 @@ package pe.factos.billing.interfaces.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,13 +58,16 @@ public class DocumentsController {
     }
 
     @GetMapping("/issuer/{ruc}")
-    @Operation(summary = "List documents by issuer RUC", description = "Returns all electronic documents emitted by an issuer RUC")
-    public ResponseEntity<List<CpeResource>> getCpesByIssuerRuc(@PathVariable String ruc) {
-        var query = new GetCpesByIssuerRucQuery(ruc);
-        var cpes = queryService.handle(query);
-        var resources = cpes.stream()
-                .map(CpeResourceFromAggregateAssembler::toResourceFromAggregate)
-                .toList();
-        return ResponseEntity.ok(resources);
+    @Operation(summary = "List documents by issuer RUC", description = "Returns paginated electronic documents emitted by an issuer RUC")
+    public ResponseEntity<Page<CpeResource>> getCpesByIssuerRuc(
+            @PathVariable String ruc,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        var query = new GetCpesByIssuerRucQuery(ruc, pageable);
+        var cpesPage = queryService.handle(query);
+        var resourcePage = cpesPage.map(CpeResourceFromAggregateAssembler::toResourceFromAggregate);
+        return ResponseEntity.ok(resourcePage);
     }
 }

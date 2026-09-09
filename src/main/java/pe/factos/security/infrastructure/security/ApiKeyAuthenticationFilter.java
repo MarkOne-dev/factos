@@ -35,7 +35,8 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
         String apiKeyHeaderValue = request.getHeader(API_KEY_HEADER);
         if (apiKeyHeaderValue != null && !apiKeyHeaderValue.isBlank()) {
-            var apiKeyOpt = apiKeyRepository.findByKeyValue(apiKeyHeaderValue);
+            String hashedKey = ApiKeyHashUtils.hashApiKey(apiKeyHeaderValue);
+            var apiKeyOpt = apiKeyRepository.findByKeyValue(hashedKey);
             if (apiKeyOpt.isPresent() && apiKeyOpt.get().isValid()) {
                 var auth = new UsernamePasswordAuthenticationToken(
                         apiKeyOpt.get().getClientName(),

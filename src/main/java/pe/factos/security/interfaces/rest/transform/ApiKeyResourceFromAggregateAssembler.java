@@ -8,8 +8,9 @@ public final class ApiKeyResourceFromAggregateAssembler {
     }
 
     public static ApiKeyResource toResourceFromAggregate(ApiKey aggregate) {
+        String keyToDisplay = aggregate.getRawKey() != null ? aggregate.getRawKey() : aggregate.getKeyValue();
         return new ApiKeyResource(
-                aggregate.getKeyValue(),
+                keyToDisplay,
                 aggregate.getClientName(),
                 aggregate.getExpiresAt(),
                 aggregate.isActive()

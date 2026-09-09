@@ -44,6 +44,8 @@ public class CpeCommandServiceImpl implements CpeCommandService {
         String currency = command.currency() != null ? command.currency() : "PEN";
         List<Item> domainItems = new ArrayList<>();
         BigDecimal totalTaxable = BigDecimal.ZERO;
+        BigDecimal totalExonerated = BigDecimal.ZERO;
+        BigDecimal totalInactive = BigDecimal.ZERO;
         BigDecimal totalIgv = BigDecimal.ZERO;
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -51,12 +53,40 @@ public class CpeCommandServiceImpl implements CpeCommandService {
             BigDecimal unitPrice = itemCmd.unitPrice();
             BigDecimal quantity = itemCmd.quantity();
             BigDecimal itemTotal = unitPrice.multiply(quantity).setScale(2, RoundingMode.HALF_UP);
-            BigDecimal itemTaxableBase = itemTotal.divide(BigDecimal.valueOf(1.18), 2, RoundingMode.HALF_UP);
-            BigDecimal itemIgv = itemTotal.subtract(itemTaxableBase);
-            BigDecimal unitValue = unitPrice.divide(BigDecimal.valueOf(1.18), 4, RoundingMode.HALF_UP);
 
-            totalTaxable = totalTaxable.add(itemTaxableBase);
-            totalIgv = totalIgv.add(itemIgv);
+            IgvAffectationType affectationType = IgvAffectationType.TAXABLE_ONEROUS;
+            if (itemCmd.affectationType() != null && !itemCmd.affectationType().isBlank()) {
+                try {
+                    affectationType = IgvAffectationType.findByCode(itemCmd.affectationType());
+                } catch (IllegalArgumentException e) {
+                    try {
+                        affectationType = IgvAffectationType.valueOf(itemCmd.affectationType());
+                    } catch (Exception ignored) {
+                        affectationType = IgvAffectationType.TAXABLE_ONEROUS;
+                    }
+                }
+            }
+
+            BigDecimal itemTaxableBase;
+            BigDecimal itemIgv;
+            BigDecimal unitValue;
+
+            if (affectationType.isTaxable()) {
+                itemTaxableBase = itemTotal.divide(BigDecimal.valueOf(1.18), 2, RoundingMode.HALF_UP);
+                itemIgv = itemTotal.subtract(itemTaxableBase);
+                unitValue = unitPrice.divide(BigDecimal.valueOf(1.18), 4, RoundingMode.HALF_UP);
+                totalTaxable = totalTaxable.add(itemTaxableBase);
+                totalIgv = totalIgv.add(itemIgv);
+            } else {
+                itemTaxableBase = itemTotal;
+                itemIgv = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+                unitValue = unitPrice;
+                if (affectationType == IgvAffectationType.EXONERATED_ONEROUS) {
+                    totalExonerated = totalExonerated.add(itemTotal);
+                } else {
+                    totalInactive = totalInactive.add(itemTotal);
+                }
+            }
             totalAmount = totalAmount.add(itemTotal);
 
             domainItems.add(new Item(
@@ -65,7 +95,7 @@ public class CpeCommandServiceImpl implements CpeCommandService {
                     quantity,
                     Money.of(unitValue),
                     Money.of(unitPrice),
-                    IgvAffectationType.TAXABLE_ONEROUS,
+                    affectationType,
                     Money.of(itemTaxableBase),
                     Money.of(itemIgv),
                     Money.of(itemTotal)
@@ -74,8 +104,8 @@ public class CpeCommandServiceImpl implements CpeCommandService {
 
         CpeTotals totals = new CpeTotals(
                 new Money(totalTaxable, currency),
-                new Money(BigDecimal.ZERO, currency),
-                new Money(BigDecimal.ZERO, currency),
+                new Money(totalExonerated, currency),
+                new Money(totalInactive, currency),
                 new Money(totalIgv, currency),
                 new Money(BigDecimal.ZERO, currency),
                 new Money(totalAmount, currency)

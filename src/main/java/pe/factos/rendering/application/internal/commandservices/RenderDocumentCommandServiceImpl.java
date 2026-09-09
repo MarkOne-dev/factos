@@ -37,6 +37,21 @@ public class RenderDocumentCommandServiceImpl implements RenderDocumentCommandSe
         if (cpeOpt.isEmpty()) {
             return Result.failure(ApplicationError.notFound("cpe", command.series() + "-" + command.correlative()));
         }
+        var cpe = cpeOpt.get();
+
+        // Enforce issuer ownership check if client principal is a RUC
+        org.springframework.security.core.Authentication auth =
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && auth.getName() != null) {
+            String clientName = auth.getName();
+            if (clientName.matches("^\\d{11}$") && !clientName.equals(cpe.getIssuerRuc().value())) {
+                return Result.failure(ApplicationError.businessRuleViolation(
+                        "OWNERSHIP_CHECK",
+                        "Client %s is not authorized to access documents of issuer %s"
+                                .formatted(clientName, cpe.getIssuerRuc().value())
+                ));
+            }
+        }
 
         String objectKey = "facturas/" + command.series() + "-" + command.correlative() + ".pdf";
 
